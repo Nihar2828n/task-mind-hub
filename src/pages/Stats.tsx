@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { CATEGORY_CONFIG, TaskCategory } from '@/lib/types';
+import { FIXED_ROUTINE, timeToMinutes } from '@/lib/routine';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
 import { format, subDays } from 'date-fns';
 
 const COLORS = ['hsl(225,75%,58%)', 'hsl(150,60%,45%)', 'hsl(0,72%,55%)', 'hsl(270,60%,55%)', 'hsl(45,90%,50%)', 'hsl(25,85%,55%)'];
+
+// Total routine minutes per day
+const routineMinutesPerDay = FIXED_ROUTINE.reduce((sum, r) => sum + (timeToMinutes(r.endTime) - timeToMinutes(r.startTime)), 0);
+const routineHours = Math.floor(routineMinutesPerDay / 60);
+const routineRemainder = routineMinutesPerDay % 60;
 
 export default function Stats() {
   const { tasks, moods } = useApp();
@@ -21,7 +27,7 @@ export default function Stats() {
     };
   });
 
-  // Category breakdown
+  // Category breakdown (user tasks)
   const categoryData = (Object.keys(CATEGORY_CONFIG) as TaskCategory[]).map((cat) => {
     const catTasks = tasks.filter(t => t.category === cat);
     const totalMin = catTasks.reduce((s, t) => s + t.duration, 0);
@@ -49,12 +55,7 @@ export default function Stats() {
       </motion.div>
 
       {/* Summary Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="grid grid-cols-2 gap-3"
-      >
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 gap-3">
         <div className="glass-card p-4 text-center">
           <p className="text-3xl font-bold text-primary">{totalCompleted}</p>
           <p className="text-xs text-muted-foreground mt-1">Tasks Completed</p>
@@ -65,13 +66,35 @@ export default function Stats() {
         </div>
       </motion.div>
 
+      {/* Daily Routine Summary */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
+        <h3 className="text-sm font-semibold text-foreground mb-3">Daily Fixed Routine</h3>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p className="text-2xl font-bold text-primary">{FIXED_ROUTINE.length}</p>
+            <p className="text-[10px] text-muted-foreground">Blocks/Day</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-primary">{routineHours}h {routineRemainder}m</p>
+            <p className="text-[10px] text-muted-foreground">Scheduled/Day</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-primary">{Math.max(0, 24 - routineHours)}h</p>
+            <p className="text-[10px] text-muted-foreground">Free Time</p>
+          </div>
+        </div>
+        <div className="mt-3 space-y-1">
+          {FIXED_ROUTINE.map((r) => (
+            <div key={r.id} className="flex items-center justify-between text-xs py-1 border-b border-border/30 last:border-0">
+              <span className="text-foreground">{r.emoji && <span className="mr-1">{r.emoji}</span>}{r.title}</span>
+              <span className="text-muted-foreground font-mono text-[10px]">{r.startTime}–{r.endTime}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Weekly Chart */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="glass-card p-4"
-      >
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
         <h3 className="text-sm font-semibold text-foreground mb-3">This Week</h3>
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={weekData}>
@@ -84,12 +107,7 @@ export default function Stats() {
 
       {/* Category Breakdown */}
       {categoryData.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="glass-card p-4"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3">Time by Category</h3>
           <div className="flex items-center gap-4">
             <ResponsiveContainer width={120} height={120}>
@@ -115,12 +133,7 @@ export default function Stats() {
       )}
 
       {/* Mood History */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="glass-card p-4"
-      >
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-4">
         <h3 className="text-sm font-semibold text-foreground mb-3">Mood This Week</h3>
         <div className="flex justify-between items-end px-2">
           {moodData.map((d, i) => (
