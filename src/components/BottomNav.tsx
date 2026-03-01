@@ -1,9 +1,10 @@
-import { Home, CalendarClock, BarChart3, Settings } from 'lucide-react';
+import { Home, CalendarClock, BarChart3, Settings, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const tabs = [
   { id: 'dashboard', label: 'Home', icon: Home },
   { id: 'scheduler', label: 'Planner', icon: CalendarClock },
+  { id: 'notebook', label: 'Notebook', icon: BookOpen },
   { id: 'stats', label: 'Stats', icon: BarChart3 },
   { id: 'settings', label: 'Settings', icon: Settings },
 ] as const;
@@ -25,7 +26,7 @@ export default function BottomNav({ active, onChange }: BottomNavProps) {
             <button
               key={tab.id}
               onClick={() => onChange(tab.id)}
-              className="relative flex flex-col items-center gap-0.5 px-4 py-2 transition-colors"
+              className="relative flex flex-col items-center gap-0.5 px-2 py-2 transition-colors"
             >
               {isActive && (
                 <motion.div
@@ -35,10 +36,10 @@ export default function BottomNav({ active, onChange }: BottomNavProps) {
                 />
               )}
               <tab.icon
-                size={22}
+                size={20}
                 className={isActive ? 'text-primary' : 'text-muted-foreground'}
               />
-              <span className={`text-[10px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span className={`text-[9px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                 {tab.label}
               </span>
             </button>
