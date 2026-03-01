@@ -31,6 +31,7 @@ export interface UserSettings {
   wakeTime: string;
   sleepTime: string;
   onboarded: boolean;
+  showFixedRoutine: boolean;
 }
 
 export const CATEGORY_CONFIG: Record<TaskCategory, { label: string; emoji: string; className: string }> = {

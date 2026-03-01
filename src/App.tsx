@@ -10,21 +10,23 @@ import Dashboard from "@/pages/Dashboard";
 import Scheduler from "@/pages/Scheduler";
 import Stats from "@/pages/Stats";
 import SettingsPage from "@/pages/Settings";
-import Onboarding from "@/components/Onboarding";
+import NotebookLMPage from "@/pages/NotebookLM";
+import UserLogin from "@/components/UserLogin";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-  const { settings } = useApp();
+  const { settings, currentUser } = useApp();
 
-  if (!settings.onboarded) {
-    return <Onboarding />;
+  if (!currentUser) {
+    return <UserLogin />;
   }
 
   const pages: Record<TabId, JSX.Element> = {
     dashboard: <Dashboard />,
     scheduler: <Scheduler />,
+    notebook: <NotebookLMPage />,
     stats: <Stats />,
     settings: <SettingsPage />,
   };
